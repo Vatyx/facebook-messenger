@@ -81,7 +81,6 @@ type TextMessage struct {
 	Recipient        recipient          `json:"recipient"`
 	NotificationType NotificationType   `json:"notification_type,omitempty"`
 	MessagingType 	 MessagingType   	`json:"messaging_type,omitempty"`
-	QuickReplies	 []QuickReply		`json:"quick_replies"`
 }
 
 // GenericMessage struct used for sending structural messages to messenger (messages with images, links, and buttons)
@@ -97,6 +96,7 @@ type recipient struct {
 
 type textMessageContent struct {
 	Text string `json:"text,omitempty"`
+	QuickReplies	 []QuickReply		`json:"quick_replies,omitempty"`
 }
 
 type genericMessageContent struct {
@@ -143,9 +143,8 @@ func (msng Messenger) NewTextMessage(userID int64, text string) TextMessage {
 func (msng Messenger) NewTextMessageWithQuickReplies(userID int64, text string, quickReplies []QuickReply) TextMessage {
 	return TextMessage{
 		Recipient: recipient{ID: userID},
-		Message:   textMessageContent{Text: text},
+		Message:   textMessageContent{Text: text, QuickReplies: quickReplies},
 		MessagingType: MessagingTypeResponse,
-		QuickReplies: quickReplies,
 	}
 }
 

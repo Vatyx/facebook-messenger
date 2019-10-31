@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const apiURL = "https://graph.facebook.com/v2.6/"
+const apiURL = "https://graph.facebook.com/v5.0/"
 
 // TestURL to mock FB server, used for testing
 var TestURL = ""
