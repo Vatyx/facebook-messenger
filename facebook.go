@@ -25,9 +25,14 @@ type FacebookRequest struct {
 
 // FacebookMessage struct for text messaged received from facebook server as part of FacebookRequest struct
 type FacebookMessage struct {
-	Mid  string `json:"mid"`
-	Seq  int    `json:"seq"`
-	Text string `json:"text"`
+	Mid  string 					`json:"mid"`
+	QuickReply *FacebookQuickReply  `json:"quick_reply"`
+	Seq  int    					`json:"seq"`
+	Text string 					`json:"text"`
+}
+
+type FacebookQuickReply struct {
+	Payload string `json:"payload"`
 }
 
 // FacebookDelivery struct for delivery reports received from Facebook server as part of FacebookRequest struct

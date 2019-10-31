@@ -12,6 +12,12 @@ type TemplateType string
 // NotificationType for sent messages
 type NotificationType string
 
+// MessagingType for send messages
+type MessagingType string
+
+// QuickReplyType for quick reply types
+type QuickReplyType string
+
 // Message interface that represents all type of messages that we can send to Facebook Messenger
 type Message interface {
 	foo()
@@ -41,13 +47,41 @@ const (
 
 	// NotificationTypeNoPush for no push
 	NotificationTypeNoPush = NotificationType("NO_PUSH")
+
+	// Response to received message
+	MessagingTypeResponse = MessagingType("RESPONSE")
+
+	// Send proactively sent inside the 24 hour policy
+	MessagingTypeUpdate = MessagingType("UPDATE")
+
+	// Non promotional sent outside the 24 hour policy
+	MessagingTypeMessageTag = MessagingType("MESSAGE_TAG")
+
+	// QuickReply with a title, custom image, and custom payload
+	QuickReplyTypeText = QuickReplyType("text")
+
+	// QuickReply where payload is user's phone number
+	QuickReplyTypePhoneNumber = QuickReplyType("user_phone_number")
+
+	// QuickReply where payload is user's email
+	QuickReplyTypeEmail = QuickReplyType("user_email")
 )
+
+// Generic Quick Reply template
+type QuickReply struct {
+	ContentType QuickReplyType 	`json:"content_type"`
+	Title       string 			`json:"title,omitempty"`
+	Payload   	string 			`json:"payload,omitempty"`
+	ImageURL    string 			`json:"image_url,omitempty"`
+}
 
 // TextMessage struct used for sending text messages to messenger
 type TextMessage struct {
 	Message          textMessageContent `json:"message"`
 	Recipient        recipient          `json:"recipient"`
 	NotificationType NotificationType   `json:"notification_type,omitempty"`
+	MessagingType 	 MessagingType   	`json:"messaging_type,omitempty"`
+	QuickReplies	 []QuickReply		`json:"quick_replies"`
 }
 
 // GenericMessage struct used for sending structural messages to messenger (messages with images, links, and buttons)
@@ -103,6 +137,15 @@ func (msng Messenger) NewTextMessage(userID int64, text string) TextMessage {
 	return TextMessage{
 		Recipient: recipient{ID: userID},
 		Message:   textMessageContent{Text: text},
+	}
+}
+
+func (msng Messenger) NewTextMessageWithQuickReplies(userID int64, text string, quickReplies []QuickReply) TextMessage {
+	return TextMessage{
+		Recipient: recipient{ID: userID},
+		Message:   textMessageContent{Text: text},
+		MessagingType: MessagingTypeResponse,
+		QuickReplies: quickReplies,
 	}
 }
 
@@ -186,4 +229,25 @@ func (e *Element) AddPostbackButton(title, payload string) {
 		Payload: payload,
 	}
 	e.Buttons = append(e.Buttons, b)
+}
+
+func (msng Messenger) NewQuickReplyText(title string, imageURL string, payload string) QuickReply {
+	return QuickReply{
+		ContentType: QuickReplyTypeText,
+		Title: title,
+		ImageURL: imageURL,
+		Payload: payload,
+	}
+}
+
+func (msng Messenger) NewQuickReplyPhoneNumber() QuickReply {
+	return QuickReply{
+		ContentType: QuickReplyTypePhoneNumber,
+	}
+}
+
+func (msng Messenger) NewQuickReplyEmail() QuickReply {
+	return QuickReply{
+		ContentType: QuickReplyTypeEmail,
+	}
 }
